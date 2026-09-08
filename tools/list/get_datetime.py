@@ -5,7 +5,7 @@ get_datetime_tool = {
     "type": "function",
     "function": {
         "name": "get_datetime",
-        "description": "mengembalikan informasi waktu real-time seperti jam, menit, hari, tanggal, tahun.",
+        "description": "mengembalikan informasi waktu real-time seperti jam, menit, hari, tanggal, bulan, tahun.",
         "parameters": {
     "type": "object",
     "properties": {},
