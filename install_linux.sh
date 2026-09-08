@@ -27,6 +27,17 @@ printf 'Nama model Ollama [qwen3:1.7b]: '
 read -r OLLAMA_MODEL
 OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:1.7b}"
 
+printf 'Model wake word [alexa] (alexa/piupiu): '
+read -r WAKEWORD_MODEL
+WAKEWORD_MODEL="${WAKEWORD_MODEL:-alexa}"
+WAKEWORD_MODEL="${WAKEWORD_MODEL##*/}"
+WAKEWORD_MODEL="${WAKEWORD_MODEL%.onnx}"
+case "${WAKEWORD_MODEL}" in
+    alexa) WAKEWORD_FILE="alexa_v0.1.onnx" ;;
+    piupiu) WAKEWORD_FILE="piupiu.onnx" ;;
+    *) WAKEWORD_FILE="${WAKEWORD_MODEL}.onnx" ;;
+esac
+
 printf 'File system prompt [config/system_prompt.txt]: '
 read -r SYSTEM_PROMPT_SOURCE
 SYSTEM_PROMPT_SOURCE="${SYSTEM_PROMPT_SOURCE:-config/system_prompt.txt}"
@@ -85,7 +96,7 @@ python -m pip install "${ROOT_DIR}/openWakeWord"
 if [[ "${SYSTEM_PROMPT_PATH}" != "${ROOT_DIR}/config/system_prompt.txt" ]]; then
     cp "${SYSTEM_PROMPT_PATH}" "${ROOT_DIR}/config/system_prompt.txt"
 fi
-OLLAMA_HOST="${OLLAMA_HOST}" OLLAMA_MODEL="${OLLAMA_MODEL}" ROOT_DIR="${ROOT_DIR}" \
+OLLAMA_HOST="${OLLAMA_HOST}" OLLAMA_MODEL="${OLLAMA_MODEL}" WAKEWORD_MODEL="${WAKEWORD_MODEL}" ROOT_DIR="${ROOT_DIR}" \
     "${PYTHON_BIN}" - <<'PY'
 import json
 import os
@@ -95,6 +106,8 @@ root = Path(os.environ["ROOT_DIR"])
 config = {
     "ollama_host": os.environ["OLLAMA_HOST"],
     "ollama_model": os.environ["OLLAMA_MODEL"],
+    "wakeword_model": os.environ["WAKEWORD_MODEL"],
+    "wakeword_threshold": 0.85,
     "conversation_timeout": 8,
     "enable_thinking_sound": True,
     "system_prompt_file": "config/system_prompt.txt",
@@ -131,7 +144,7 @@ if ! curl -fsS "${OLLAMA_HOST}/api/tags" | grep -q "${OLLAMA_MODEL}"; then
 fi
 
 for required_file in \
-    "model/shared/piupiu.onnx" \
+    "model/shared/${WAKEWORD_FILE}" \
     "model/tts/kokoro-v1.0.onnx" \
     "model/tts/voices-v1.0.bin" \
     "model/tts/piper/id_ID-news_tts-medium.onnx"; do

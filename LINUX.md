@@ -11,7 +11,7 @@ chmod +x install_linux.sh run_linux.sh
 
 Installer akan:
 
-- meminta alamat server Ollama, nama model, dan file system prompt;
+- meminta alamat server Ollama, nama model, model wake word, dan file system prompt;
 - menyimpan pengaturan di `config/settings.json`;
 - menyimpan role system aktif di `config/system_prompt.txt`;
 - memasang Python 3.11, compiler, PortAudio, libsndfile, FFmpeg, dan curl;
@@ -34,8 +34,19 @@ Script membaca host dan model dari `config/settings.json`. Ollama lokal akan dij
 
 Pengaturan dapat diubah tanpa instalasi ulang:
 
-- `config/settings.json`: alamat Ollama, model, timeout, dan opsi suara thinking;
+- `config/settings.json`: alamat Ollama, model, wake word, threshold, timeout, dan opsi suara thinking;
 - `config/system_prompt.txt`: role system yang digabungkan dengan history sebelum dikirim ke Ollama.
+
+## Input Aplikasi
+
+Aplikasi mendukung dua cara input:
+
+- Ketik langsung pada `Prompt (Enter untuk voice):` untuk mengirim teks tanpa wake word.
+- Tekan `Enter` pada prompt, lalu ucapkan wake word dan perintah suara.
+
+Model wake word default adalah `alexa` dan menggunakan file `model/shared/alexa_v0.1.onnx`. Model custom `piupiu` dapat dipilih di `config/settings.json` dengan memastikan `model/shared/piupiu.onnx` tersedia.
+
+OpenWakeWord menggunakan threshold `0.85` secara default. Naikkan nilainya jika terlalu sering aktif sendiri; turunkan jika wake word sulit terdeteksi.
 
 ## Catatan
 

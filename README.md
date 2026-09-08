@@ -35,7 +35,8 @@ Installer akan meminta:
 
 1. Alamat server Ollama, misalnya `192.168.1.20:11434`.
 2. Nama model Ollama, default `qwen3:1.7b`.
-3. File system prompt, default `config/system_prompt.txt`.
+3. Model wake word, default `alexa` (`alexa` atau `piupiu`).
+4. File system prompt, default `config/system_prompt.txt`.
 
 Installer membuat virtual environment, memasang dependency, memeriksa model lokal atau remote, dan memvalidasi file model audio.
 
@@ -53,6 +54,8 @@ Pengaturan utama berada di [config/settings.json](config/settings.json):
 {
   "ollama_host": "http://127.0.0.1:11434",
   "ollama_model": "qwen3:1.7b",
+  "wakeword_model": "alexa",
+  "wakeword_threshold": 0.85,
   "conversation_timeout": 8,
   "enable_thinking_sound": true,
   "system_prompt_file": "config/system_prompt.txt"
@@ -82,7 +85,7 @@ Dari PC HomeAssisten, ganti `ollama_host` di `config/settings.json` dengan alama
 
 ## Struktur Konfigurasi
 
-- `config/settings.json`: host, model, timeout, dan opsi runtime.
+- `config/settings.json`: host, model, wake word, threshold, timeout, dan opsi runtime.
 - `config/system_prompt.txt`: role system AI.
 - `core/config.py`: loader konfigurasi.
 - `install_linux.sh`: installer Debian/Ubuntu.
@@ -101,6 +104,44 @@ function.name     -> get_weather
 ```
 
 Panduan lengkap struktur file, schema parameter, aturan penamaan, dan pengujian tersedia di [TOOLS.md](TOOLS.md).
+
+## OpenWakeWord
+
+HomeAssisten menggunakan OpenWakeWord untuk mendeteksi wake word dari mikrofon. Model default adalah `alexa`, sehingga file berikut harus tersedia:
+
+```text
+model/shared/alexa_v0.1.onnx
+```
+
+Untuk memakai model custom hasil training `piupiu`, ubah `wakeword_model` menjadi `piupiu` di [config/settings.json](config/settings.json), lalu pastikan file berikut tersedia:
+
+```text
+model/shared/piupiu.onnx
+```
+
+Nama konfigurasi `alexa` dipetakan ke file `alexa_v0.1.onnx`. `wakeword_threshold` berada pada rentang `0.0` sampai `1.0`. Nilai lebih tinggi mengurangi false positive, tetapi membutuhkan ucapan yang lebih jelas.
+
+## Cara Menggunakan
+
+### Input teks langsung
+
+Jalankan aplikasi lalu ketik perintah pada prompt:
+
+```text
+Prompt (Enter untuk voice): 7 x 7
+```
+
+Teks langsung segera dikirim ke AI tanpa menunggu wake word.
+
+### Input suara
+
+Tekan `Enter` tanpa mengetik teks. Aplikasi akan menunggu wake word yang dipilih, lalu mendengarkan perintah suara.
+
+```text
+Tekan Enter -> ucapkan wake word -> ucapkan perintah -> AI menjawab
+```
+
+Pastikan mikrofon memiliki permission dan model wake word tersedia di `model/shared/`.
 
 ## GitHub
 
