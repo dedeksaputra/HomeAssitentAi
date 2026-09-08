@@ -88,6 +88,20 @@ Dari PC HomeAssisten, ganti `ollama_host` di `config/settings.json` dengan alama
 - `install_linux.sh`: installer Debian/Ubuntu.
 - `run_linux.sh`: pemeriksaan Ollama dan runner aplikasi.
 
+## Tools
+
+Tool runtime disimpan di folder [tools/list](tools/list). Loader mencari dictionary schema dengan nama berakhiran `_tool`, lalu memanggil function Python yang namanya sama dengan `function.name` pada schema tanpa suffix `_tool`.
+
+Contoh:
+
+```text
+get_weather_tool  -> schema yang dibaca loader
+get_weather       -> function Python yang dipanggil runtime
+function.name     -> get_weather
+```
+
+Panduan lengkap struktur file, schema parameter, aturan penamaan, dan pengujian tersedia di [TOOLS.md](TOOLS.md).
+
 ## GitHub
 
 Model besar sengaja tidak di-commit ke repository. Dengan begitu clone source tidak memerlukan Git LFS atau kuota LFS GitHub.
