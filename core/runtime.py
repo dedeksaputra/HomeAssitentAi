@@ -172,7 +172,11 @@ class Runtime:
             "\nWaiting WakeWord..."
         )
 
-        self.wakeword.wait()
+        if not self.wakeword.wait():
+            print(
+                "Kembali ke mode input teks"
+            )
+            return ""
 
         if not self.running:
             return ""

@@ -43,6 +43,7 @@ Aplikasi mendukung dua cara input:
 
 - Ketik langsung pada `Prompt (Enter untuk voice):` untuk mengirim teks tanpa wake word.
 - Tekan `Enter` pada prompt, lalu ucapkan wake word dan perintah suara.
+- Saat menunggu wake word, tekan `q` untuk kembali ke mode input teks.
 
 Model wake word default adalah `alexa` dan menggunakan file `model/shared/alexa_v0.1.onnx`. Model custom `piupiu` dapat dipilih di `config/settings.json` dengan memastikan `model/shared/piupiu.onnx` tersedia.
 

@@ -141,6 +141,8 @@ Tekan `Enter` tanpa mengetik teks. Aplikasi akan menunggu wake word yang dipilih
 Tekan Enter -> ucapkan wake word -> ucapkan perintah -> AI menjawab
 ```
 
+Saat sedang menunggu wake word, tekan `q` untuk membatalkan mode suara dan kembali ke prompt input teks.
+
 Pastikan mikrofon memiliki permission dan model wake word tersedia di `model/shared/`.
 
 ## GitHub
