@@ -35,8 +35,9 @@ Installer akan meminta:
 
 1. Alamat server Ollama, misalnya `192.168.1.20:11434`.
 2. Nama model Ollama, default `qwen3:1.7b`.
-3. Model wake word, default `alexa` (`alexa` atau `piupiu`).
-4. File system prompt, default `config/system_prompt.txt`.
+3. Mode thinking Ollama, default nonaktif.
+4. Model wake word, default `alexa` (`alexa` atau `piupiu`).
+5. File system prompt, default `config/system_prompt.txt`.
 
 Installer membuat virtual environment, memasang dependency, memeriksa model lokal atau remote, dan memvalidasi file model audio.
 
@@ -54,6 +55,7 @@ Pengaturan utama berada di [config/settings.json](config/settings.json):
 {
   "ollama_host": "http://127.0.0.1:11434",
   "ollama_model": "qwen3:1.7b",
+  "ollama_think": false,
   "wakeword_model": "alexa",
   "wakeword_threshold": 0.85,
   "conversation_timeout": 8,
@@ -63,6 +65,8 @@ Pengaturan utama berada di [config/settings.json](config/settings.json):
 ```
 
 Role system berada di [config/system_prompt.txt](config/system_prompt.txt). File tersebut dibaca runtime dan digabungkan dengan history sebelum pesan dikirim ke Ollama.
+
+`ollama_think` mengatur mode reasoning Ollama. Gunakan `true` jika ingin model melakukan proses thinking, dengan konsekuensi respons biasanya lebih lambat; gunakan `false` untuk respons lebih cepat.
 
 `OLLAMA_HOST` dapat digunakan sebagai override sementara:
 
@@ -85,7 +89,7 @@ Dari PC HomeAssisten, ganti `ollama_host` di `config/settings.json` dengan alama
 
 ## Struktur Konfigurasi
 
-- `config/settings.json`: host, model, wake word, threshold, timeout, dan opsi runtime.
+- `config/settings.json`: host, model, mode thinking Ollama, wake word, threshold, timeout, dan opsi runtime.
 - `config/system_prompt.txt`: role system AI.
 - `core/config.py`: loader konfigurasi.
 - `install_linux.sh`: installer Debian/Ubuntu.

@@ -27,6 +27,13 @@ printf 'Nama model Ollama [qwen3:1.7b]: '
 read -r OLLAMA_MODEL
 OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:1.7b}"
 
+printf 'Aktifkan mode thinking Ollama? [y/N]: '
+read -r OLLAMA_THINK_INPUT
+case "${OLLAMA_THINK_INPUT,,}" in
+    y|yes|ya) OLLAMA_THINK=true ;;
+    *) OLLAMA_THINK=false ;;
+esac
+
 printf 'Model wake word [alexa] (alexa/piupiu): '
 read -r WAKEWORD_MODEL
 WAKEWORD_MODEL="${WAKEWORD_MODEL:-alexa}"
@@ -96,7 +103,7 @@ python -m pip install "${ROOT_DIR}/openWakeWord"
 if [[ "${SYSTEM_PROMPT_PATH}" != "${ROOT_DIR}/config/system_prompt.txt" ]]; then
     cp "${SYSTEM_PROMPT_PATH}" "${ROOT_DIR}/config/system_prompt.txt"
 fi
-OLLAMA_HOST="${OLLAMA_HOST}" OLLAMA_MODEL="${OLLAMA_MODEL}" WAKEWORD_MODEL="${WAKEWORD_MODEL}" ROOT_DIR="${ROOT_DIR}" \
+OLLAMA_HOST="${OLLAMA_HOST}" OLLAMA_MODEL="${OLLAMA_MODEL}" OLLAMA_THINK="${OLLAMA_THINK}" WAKEWORD_MODEL="${WAKEWORD_MODEL}" ROOT_DIR="${ROOT_DIR}" \
     "${PYTHON_BIN}" - <<'PY'
 import json
 import os
@@ -106,6 +113,7 @@ root = Path(os.environ["ROOT_DIR"])
 config = {
     "ollama_host": os.environ["OLLAMA_HOST"],
     "ollama_model": os.environ["OLLAMA_MODEL"],
+    "ollama_think": os.environ["OLLAMA_THINK"] == "true",
     "wakeword_model": os.environ["WAKEWORD_MODEL"],
     "wakeword_threshold": 0.85,
     "conversation_timeout": 8,

@@ -34,6 +34,9 @@ class Runtime:
         self.enable_thinking_sound = bool(
             self.config.get("enable_thinking_sound", True)
         )
+        self.ollama_think = bool(
+            self.config.get("ollama_think", False)
+        )
 
         # =================================================
         # SERVICES
@@ -57,7 +60,7 @@ class Runtime:
         self.llm = OllamaLLM(
                             model=str(self.config.get("ollama_model", "qwen3:1.7b")),
                             host=get_ollama_host(self.config),
-                            think=False,
+                            think=self.ollama_think,
                             keep_alive="30m",
                             tools=self.tools
                         )

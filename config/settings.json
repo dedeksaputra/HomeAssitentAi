@@ -1,6 +1,7 @@
 {
   "ollama_host": "http://127.0.0.1:11434",
   "ollama_model": "qwen3:1.7b",
+  "ollama_think": false,
   "wakeword_model": "alexa",
   "wakeword_threshold": 0.85,
   "conversation_timeout": 8,

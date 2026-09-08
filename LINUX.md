@@ -11,7 +11,7 @@ chmod +x install_linux.sh run_linux.sh
 
 Installer akan:
 
-- meminta alamat server Ollama, nama model, model wake word, dan file system prompt;
+- meminta alamat server Ollama, nama model, mode thinking Ollama, model wake word, dan file system prompt;
 - menyimpan pengaturan di `config/settings.json`;
 - menyimpan role system aktif di `config/system_prompt.txt`;
 - memasang Python 3.11, compiler, PortAudio, libsndfile, FFmpeg, dan curl;
@@ -34,7 +34,7 @@ Script membaca host dan model dari `config/settings.json`. Ollama lokal akan dij
 
 Pengaturan dapat diubah tanpa instalasi ulang:
 
-- `config/settings.json`: alamat Ollama, model, wake word, threshold, timeout, dan opsi suara thinking;
+- `config/settings.json`: alamat Ollama, model, mode thinking Ollama, wake word, threshold, timeout, dan opsi suara thinking;
 - `config/system_prompt.txt`: role system yang digabungkan dengan history sebelum dikirim ke Ollama.
 
 ## Input Aplikasi
