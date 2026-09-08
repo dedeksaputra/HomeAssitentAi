@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+.venv-linux/
+venv/
+env/
+
+# Local runtime data and logs
+history.json
+model/data/memory/
+*.log
+.ollama_host
+
+# Local archive and editor files
+non_runtime/
+.vscode/
+.DS_Store
+
+# Local configuration overrides
+config/settings.local.json
+
+# Large runtime models are distributed separately from the source repository.
+model/**/*.onnx
+model/**/*.tflite
+model/**/*.bin

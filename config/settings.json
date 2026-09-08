@@ -1,0 +1,7 @@
+{
+  "ollama_host": "http://127.0.0.1:11434",
+  "ollama_model": "qwen3:1.7b",
+  "conversation_timeout": 8,
+  "enable_thinking_sound": true,
+  "system_prompt_file": "config/system_prompt.txt"
+}
