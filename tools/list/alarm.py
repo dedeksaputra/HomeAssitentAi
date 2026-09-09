@@ -114,6 +114,7 @@ def _load_alarms() -> list[dict]:
 def _save_alarms(alarms: list[dict]) -> None:
     """Menyimpan semua alarm ke file JSON."""
 
+    ALARM_FILE.parent.mkdir(parents=True, exist_ok=True)
     with ALARM_FILE.open("w", encoding="utf-8") as file:
         json.dump(
             alarms,

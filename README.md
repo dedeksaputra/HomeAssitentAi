@@ -117,6 +117,15 @@ Tool bawaan tambahan:
 
 Tool YouTube membutuhkan `yt-dlp` dan `mpv`/`ffplay` untuk autoplay. Jika player lokal tidak tersedia, tool membuka hasil pencarian di browser. Tool cuaca dan web search membutuhkan koneksi internet.
 
+Alarm berjalan sebagai service background selama aplikasi aktif. Contoh perintah:
+
+```text
+pasang alarm jam 07:30 dengan label bangun pagi
+matikan alarm 1
+```
+
+Saat waktu tercapai, audio alarm diputar otomatis. Gunakan `stop_alarm` atau perintah suara seperti `matikan alarm` untuk menghentikan bunyi. Alarm yang sudah berbunyi menjadi nonaktif setelah dihentikan.
+
 ## OpenWakeWord
 
 HomeAssisten menggunakan OpenWakeWord untuk mendeteksi wake word dari mikrofon. Model default adalah `alexa`, sehingga file berikut harus tersedia:

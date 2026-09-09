@@ -4,6 +4,7 @@ import re
 from loguru import logger
 
 from core.config import get_ollama_host, get_system_prompt, load_config
+from core.services.alarm_service import AlarmService
 from core.services.wakeword_service import WakeWordService
 from core.services.tts_service import TTSService
 from core.services.speech_service import SpeechService
@@ -52,6 +53,7 @@ class Runtime:
         self.tts = TTSService()
 
         self.speech = SpeechService()
+        self.alarm = AlarmService()
         
         # =================================================
         # TOOLS
@@ -80,6 +82,7 @@ class Runtime:
     def run(self):
 
         self.running = True
+        self.alarm.start()
 
         print(
             "Runtime Running..."
@@ -506,6 +509,7 @@ class Runtime:
         )
 
         self.running = False
+        self.alarm.stop()
 
         # ================================================
         # CLEAR SESSION MEMORY
