@@ -109,6 +109,13 @@ function.name     -> get_weather
 
 Panduan lengkap struktur file, schema parameter, aturan penamaan, dan pengujian tersedia di [TOOLS.md](TOOLS.md).
 
+Tool bawaan tambahan:
+
+- `play_music_youtube`: membuka pencarian YouTube berdasarkan judul musik dan artis.
+- `get_weather`: mengambil cuaca terkini berdasarkan nama kota melalui `wttr.in`.
+
+Tool YouTube membutuhkan browser desktop dan membuka hasil pencarian, sedangkan tool cuaca membutuhkan koneksi internet.
+
 ## OpenWakeWord
 
 HomeAssisten menggunakan OpenWakeWord untuk mendeteksi wake word dari mikrofon. Model default adalah `alexa`, sehingga file berikut harus tersedia:

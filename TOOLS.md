@@ -175,6 +175,34 @@ turn_on_lamp_tool = {
 
 def turn_on_lamp() -> str:
     return "Lampu menyala."
+
+## Tool Musik YouTube
+
+File `tools/list/play_music_youtube.py` menyediakan tool `play_music_youtube`.
+
+Contoh perintah user:
+
+```text
+mainkan musik Numb dari Linkin Park di YouTube
+```
+
+Tool akan membuka browser pada halaman hasil pencarian YouTube berdasarkan judul musik. Berikan judul dan nama artis jika diketahui agar hasil lebih tepat.
+
+Tool ini tidak memakai YouTube API dan tidak memilih video secara otomatis. Karena itu browser harus tersedia pada komputer yang menjalankan HomeAssisten.
+
+## Tool Cuaca
+
+File `tools/list/weather.py` menyediakan tool `get_weather`.
+
+Contoh perintah user:
+
+```text
+bagaimana cuaca di Jakarta?
+```
+
+Tool mengambil data cuaca terkini dari `wttr.in` dan mengembalikan kota, kondisi, suhu, suhu yang terasa, kelembapan, dan kecepatan angin. Tool membutuhkan koneksi internet.
+
+Jika API cuaca tidak dapat dihubungi, tool mengembalikan `success: false` beserta pesan error agar AI dapat menyampaikannya kepada user.
 ```
 
 ## Aturan Praktis
