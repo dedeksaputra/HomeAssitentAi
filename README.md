@@ -111,10 +111,11 @@ Panduan lengkap struktur file, schema parameter, aturan penamaan, dan pengujian 
 
 Tool bawaan tambahan:
 
-- `play_music_youtube`: membuka pencarian YouTube berdasarkan judul musik dan artis.
+- `play_music_youtube`: memutar audio video pertama dari YouTube berdasarkan judul musik dan artis.
 - `get_weather`: mengambil cuaca terkini berdasarkan nama kota melalui `wttr.in`.
+- `search_web`: mencari informasi terkini di web dan mengembalikan hasilnya untuk diringkas AI.
 
-Tool YouTube membutuhkan browser desktop dan membuka hasil pencarian, sedangkan tool cuaca membutuhkan koneksi internet.
+Tool YouTube membutuhkan `yt-dlp` dan `mpv`/`ffplay` untuk autoplay. Jika player lokal tidak tersedia, tool membuka hasil pencarian di browser. Tool cuaca dan web search membutuhkan koneksi internet.
 
 ## OpenWakeWord
 

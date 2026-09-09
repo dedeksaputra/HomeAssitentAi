@@ -72,6 +72,7 @@ if ! command -v "${PYTHON_BIN}" >/dev/null 2>&1; then
         libsndfile1-dev \
         portaudio19-dev \
         ffmpeg \
+        mpv \
         curl
 else
     log "Python ${PYTHON_BIN} ditemukan"
@@ -84,6 +85,7 @@ else
         libsndfile1-dev \
         portaudio19-dev \
         ffmpeg \
+        mpv \
         curl
 fi
 
