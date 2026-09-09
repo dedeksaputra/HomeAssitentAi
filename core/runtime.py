@@ -242,6 +242,8 @@ class Runtime:
 
             if not response.message.tool_calls and self._is_datetime_request(text):
                 response = self._force_datetime_tool(response)
+            elif not response.message.tool_calls and self._is_alarm_request(text):
+                response = self._force_set_alarm(response, text)
 
             for _ in range(5):
                 tool_calls = response.message.tool_calls or []
@@ -305,6 +307,73 @@ class Runtime:
             "name": tool_name,
         })
         print(f"Executing tool: {tool_name} (forced for datetime request)")
+        return self.llm.generate(self.build_chat_messages(10))
+
+    @staticmethod
+    def _parse_alarm_request(text: str):
+        normalized = re.sub(r"\s+", " ", text.lower().strip())
+        time_match = re.search(
+            r"\bjam\s+(\d{1,2})(?::|\s)(\d{2})\b",
+            normalized,
+        )
+        if not time_match:
+            return None
+
+        hour = int(time_match.group(1))
+        minute = int(time_match.group(2))
+        if hour > 23 or minute > 59:
+            return None
+
+        label_match = re.search(
+            r"\b(?:judul|label)\s+(.+?)(?:\s+dan\s+|$)",
+            normalized,
+        )
+        label = label_match.group(1).strip().title() if label_match else "Alarm"
+        return f"{hour:02d}:{minute:02d}", label
+
+    @classmethod
+    def _is_alarm_request(cls, text: str) -> bool:
+        normalized = text.lower()
+        return bool(
+            re.search(r"\b(?:buat|pasang|setel|atur)\s+alar+a?m\b", normalized)
+            and cls._parse_alarm_request(text)
+        )
+
+    def _force_set_alarm(self, response, text: str):
+        parsed = self._parse_alarm_request(text)
+        function_to_call = self.available_functions.get("set_alarm")
+        if parsed is None or function_to_call is None:
+            return response
+
+        alarm_time, label = parsed
+        result = function_to_call(time=alarm_time, label=label)
+        result_text = result if isinstance(result, str) else json.dumps(
+            result,
+            ensure_ascii=False,
+        )
+
+        add_history({
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [{
+                "function": {
+                    "name": "set_alarm",
+                    "arguments": {
+                        "time": alarm_time,
+                        "label": label,
+                    },
+                }
+            }],
+        })
+        add_history({
+            "role": "tool",
+            "content": result_text,
+            "name": "set_alarm",
+        })
+        print(
+            f"Executing tool: set_alarm (forced): "
+            f"time={alarm_time}, label={label}"
+        )
         return self.llm.generate(self.build_chat_messages(10))
 
     def _process_tool_call(self, response, tool_call):
