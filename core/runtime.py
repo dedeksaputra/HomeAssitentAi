@@ -202,7 +202,22 @@ class Runtime:
     # =====================================================
 
     def build_chat_messages(self, history_limit: int = 10):
-        history_messages = get_history_last(history_limit)
+        history_messages = []
+        for message in get_history_last(history_limit):
+            role = message.get("role")
+
+            if role == "tools":
+                continue
+
+            if (
+                role == "assistant"
+                and not message.get("content")
+                and not message.get("tool_calls")
+            ):
+                continue
+
+            history_messages.append(message)
+
         messages = [
             {"role": "system", "content": self.system_prompt}
         ]
@@ -221,10 +236,17 @@ class Runtime:
             add_history({"role": "user", "content": text})
             response = self.llm.generate(self.build_chat_messages(10))
 
-            for tool_call in response.message.tool_calls or []:
-                response = self._process_tool_call(tool_call, text)
+            for _ in range(5):
+                tool_calls = response.message.tool_calls or []
+                if not tool_calls:
+                    break
+
+                for tool_call in tool_calls:
+                    response = self._process_tool_call(response, tool_call)
 
             answer = response.message.content or ""
+            if not answer and not response.message.tool_calls:
+                logger.warning("Ollama mengembalikan respons kosong setelah tool.")
             add_history({"role": "assistant", "content": answer})
 
             if answer:
@@ -236,7 +258,7 @@ class Runtime:
             if self.enable_thinking_sound:
                 self.tts.thinking(False)
 
-    def _process_tool_call(self, tool_call, text: str):
+    def _process_tool_call(self, response, tool_call):
         tool_name = getattr(tool_call.function, "name", None)
         if not tool_name:
             return self.llm.generate(self.build_chat_messages(10))
@@ -254,12 +276,12 @@ class Runtime:
             except json.JSONDecodeError:
                 result = f"Parameter tool '{tool_name}' tidak valid."
                 print(result)
-                add_history({"role": "tools", "content": result, "tool_name": tool_name})
+                add_history({"role": "tool", "content": result, "name": tool_name})
                 return self.llm.generate(self.build_chat_messages(10))
 
         if not isinstance(arguments, dict):
             result = f"Parameter tool '{tool_name}' harus berupa object."
-            add_history({"role": "tools", "content": result, "tool_name": tool_name})
+            add_history({"role": "tool", "content": result, "name": tool_name})
             return self.llm.generate(self.build_chat_messages(10))
 
         try:
@@ -273,17 +295,27 @@ class Runtime:
         if not isinstance(result, str):
             result = json.dumps(result, ensure_ascii=False)
 
-        if tool_name == "get_datetime":
-            messages = [
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": text},
-                {"role": "tools", "content": result, "tool_name": tool_name},
-            ]
-        else:
-            add_history({"role": "tools", "content": result, "tool_name": tool_name})
-            messages = self.build_chat_messages(10)
+        assistant_message = {
+            "role": "assistant",
+            "content": response.message.content or "",
+            "tool_calls": [
+                {
+                    "function": {
+                        "name": tool_name,
+                        "arguments": arguments,
+                    }
+                }
+            ],
+        }
+        tool_message = {
+            "role": "tool",
+            "content": result,
+            "name": tool_name,
+        }
+        add_history(assistant_message)
+        add_history(tool_message)
 
-        return self.llm.generate(messages)
+        return self.llm.generate(self.build_chat_messages(10))
 
     # =====================================================
     # CONVERSATION MODE
