@@ -1,9 +1,15 @@
 from html.parser import HTMLParser
 import base64
 import re
+import ssl
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, quote_plus, urljoin, urlparse
 from urllib.request import Request, urlopen
+
+import certifi
+
+
+SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 
 
 search_web_tool = {
@@ -148,26 +154,27 @@ def search_web(query: str, max_results: int = 5) -> dict:
         headers={"User-Agent": "HomeAssisten/1.0"},
     )
 
-    try:
-        with urlopen(request, timeout=10) as response:
-            html = response.read().decode("utf-8", errors="replace")
-    except (HTTPError, URLError, TimeoutError) as error:
-        return {"success": False, "message": f"Pencarian web gagal: {error}"}
-
     parser = _DuckDuckGoParser()
-    parser.feed(html)
+    provider_errors = []
+    try:
+        with urlopen(request, timeout=10, context=SSL_CONTEXT) as response:
+            html = response.read().decode("utf-8", errors="replace")
+        parser.feed(html)
+    except (HTTPError, URLError, TimeoutError) as error:
+        provider_errors.append(f"DuckDuckGo: {error}")
+
     if not parser.results:
         bing_request = Request(
             "https://www.bing.com/search?q=" + quote_plus(query),
             headers={"User-Agent": "Mozilla/5.0 HomeAssisten/1.0"},
         )
         try:
-            with urlopen(bing_request, timeout=10) as response:
+            with urlopen(bing_request, timeout=10, context=SSL_CONTEXT) as response:
                 bing_html = response.read().decode("utf-8", errors="replace")
             parser = _BingParser()
             parser.feed(bing_html)
-        except (HTTPError, URLError, TimeoutError):
-            pass
+        except (HTTPError, URLError, TimeoutError) as error:
+            provider_errors.append(f"Bing: {error}")
     results = []
     for result in parser.results:
         result = {key: _clean_text(value) for key, value in result.items()}
@@ -177,9 +184,14 @@ def search_web(query: str, max_results: int = 5) -> dict:
         if len(results) >= max_results:
             break
 
+    if not results and provider_errors:
+        message = "Pencarian web gagal: " + " | ".join(provider_errors)
+    else:
+        message = "Hasil pencarian siap diringkas oleh AI." if results else "Tidak ada hasil ditemukan."
+
     return {
         "success": bool(results),
         "query": query,
         "results": results,
-        "message": "Hasil pencarian siap diringkas oleh AI." if results else "Tidak ada hasil ditemukan.",
+        "message": message,
     }
