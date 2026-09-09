@@ -1,4 +1,5 @@
 import json
+import re
 
 from loguru import logger
 
@@ -236,6 +237,9 @@ class Runtime:
             add_history({"role": "user", "content": text})
             response = self.llm.generate(self.build_chat_messages(10))
 
+            if not response.message.tool_calls and self._is_datetime_request(text):
+                response = self._force_datetime_tool(response)
+
             for _ in range(5):
                 tool_calls = response.message.tool_calls or []
                 if not tool_calls:
@@ -257,6 +261,48 @@ class Runtime:
         finally:
             if self.enable_thinking_sound:
                 self.tts.thinking(False)
+
+    @staticmethod
+    def _is_datetime_request(text: str) -> bool:
+        normalized = text.lower().strip()
+        patterns = (
+            r"\bjam\s+berapa\b",
+            r"\bsekarang\s+jam\s+berapa\b",
+            r"\btanggal\s+berapa\b",
+            r"\bhari\s+apa\b",
+            r"\btanggal\s+hari\s+ini\b",
+            r"\bwaktu\s+sekarang\b",
+        )
+        return any(re.search(pattern, normalized) for pattern in patterns)
+
+    def _force_datetime_tool(self, response):
+        tool_name = "get_datetime"
+        function_to_call = self.available_functions.get(tool_name)
+        if function_to_call is None:
+            logger.error("Tool wajib '%s' tidak tersedia.", tool_name)
+            return response
+
+        result = function_to_call()
+        if not isinstance(result, str):
+            result = json.dumps(result, ensure_ascii=False)
+
+        add_history({
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [{
+                "function": {
+                    "name": tool_name,
+                    "arguments": {},
+                }
+            }],
+        })
+        add_history({
+            "role": "tool",
+            "content": result,
+            "name": tool_name,
+        })
+        print(f"Executing tool: {tool_name} (forced for datetime request)")
+        return self.llm.generate(self.build_chat_messages(10))
 
     def _process_tool_call(self, response, tool_call):
         tool_name = getattr(tool_call.function, "name", None)
